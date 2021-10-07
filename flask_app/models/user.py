@@ -1,6 +1,6 @@
 # import the function that will return an instance of a connection
 from werkzeug.utils import redirect
-from mysqlconnection import connectToMySQL
+from flask_app.config.mysqlconnection import connectToMySQL
 # model the class after the friend table from our database
 class User:
     def __init__( self , data ):
@@ -10,7 +10,11 @@ class User:
         self.email = data['email']
         self.created_at = data['created_at']
         self.updated_at = data['updated_at']
-    # Now we use class methods to query our database
+
+
+# ==========================================================
+# GET METHOD, method that returns the list of the users
+# ==========================================================
     @classmethod
     def get_all(cls):
         query = "SELECT * FROM users;"
@@ -23,6 +27,10 @@ class User:
             users.append( cls(user) )
         return users
 
+# ==========================================================
+# INSERT METHOD, method that returns id of the INSERTED user
+# ***** Very Important*********
+# ==========================================================
     @classmethod
     def save(cls, data ):
         query = "INSERT INTO users(first_name, last_name, email, created_at, updated_at) VALUES(%(firstName)s, %(lastName)s, %(email)s, NOW(), NOW());"
@@ -30,21 +38,32 @@ class User:
         return connectToMySQL('users').query_db( query, data )
 
 
-    # edit and delete doesn't return anything
+# ==========================================================
+# UPDATE METHOD, method that UPDATE the user object
+# RETURNS NOTHING
+# ***** Very Important*********
+# ==========================================================
     @classmethod
     def edit(cls, data ):
-
         query = "UPDATE users SET first_name = %(firstName)s, last_name = %(lastName)s, email = %(email)s WHERE id = %(id)s"
         # data is a dictionary that will be passed into the edit method from server.py
         connectToMySQL('users').query_db( query, data )
-
+# ==========================================================
+# GET METHOD, method that returns the single object which is
+# inside the list, index 0  i.e return (cls(result[0]));
+# ***** Very Important*********
+# ==========================================================
     @classmethod
     def get_one_user(cls, data ):
         query = "SELECT * FROM users WHERE id = %(user_id)s"
         result = connectToMySQL('users').query_db( query, data);
-
         return (cls(result[0]));
 
+# ==========================================================
+# DELETE METHOD, method that DELETE the user object based 
+# dynamic id, RETURNS NOTHING
+# ***** Very Important*********
+# ==========================================================    
 
     @classmethod
     def delete_user(cls, data ):
